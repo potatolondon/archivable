@@ -1,9 +1,9 @@
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 NAME = 'archivable'
-PACKAGES = find_packages()
+PACKAGES = ['archivable']
 DESCRIPTION = 'Archivable class-decorator for django models which supports uniqueness'
 URL = "https://github.com/potatolondon/archivable"
 LONG_DESCRIPTION = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
