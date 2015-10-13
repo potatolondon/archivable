@@ -4,7 +4,7 @@ from setuptools import setup
 
 NAME = 'archivable'
 PACKAGES = ['archivable']
-DESCRIPTION = 'Archivable class-decorator for django models which supports uniqueness'
+DESCRIPTION = 'A class-decorator for archivable django-models'
 URL = "https://github.com/potatolondon/archivable"
 LONG_DESCRIPTION = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 AUTHOR = 'Potato London Ltd.'
