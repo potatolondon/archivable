@@ -1,0 +1,6 @@
+*.pyc
+.DS_Store
+
+testapp/env/
+testapp/coverage_html
+testapp/.coverage
