@@ -1,0 +1,8 @@
+[report]
+include =
+    archivable/*
+
+omit = */tests.py
+
+[html]
+directory = coverage_html
