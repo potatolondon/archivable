@@ -44,6 +44,11 @@ def _add_field_to_unique_constraints(cls, name):
     cls._meta.unique_together = new_unique_togethers
 
 
+def _store_empty_value(cls, name):
+    empty_value = cls._meta.get_field(name).default
+    cls._empty_identifier = empty_value
+
+
 def _replace_manager(cls, new_manager_name):
     if hasattr(cls, "objects"):
         default_manager = cls.objects.__class__
@@ -54,7 +59,7 @@ def _replace_manager(cls, new_manager_name):
         use_in_migrations = False
 
         def get_queryset(self):
-            return super(ExcludeArchivedManager, self).get_queryset().filter(archive_identifier=0)
+            return super(ExcludeArchivedManager, self).get_queryset().filter(archive_identifier=cls._empty_identifier)
 
     default_manager().contribute_to_class(cls, "with_archived")
     ExcludeArchivedManager().contribute_to_class(cls, "objects")
@@ -71,7 +76,7 @@ def _override_methods(cls):
         post_archive.send(sender=self.__class__, instance=self)
 
     def restore(self):
-        self.archive_identifier = 0
+        self.archive_identifier = self._empty_identifier
         self.save()
 
     def delete(self, force=False, *args, **kwargs):
@@ -82,7 +87,7 @@ def _override_methods(cls):
 
     @property
     def is_archived(self):
-        return self.archive_identifier != 0
+        return self.archive_identifier != self._empty_identifier
 
     cls.archive = archive
     cls.restore = restore
@@ -106,6 +111,7 @@ def archivable(cls):
 
     _add_field_to_class(cls, "archive_identifier")
     _add_field_to_unique_constraints(cls, "archive_identifier")
+    _store_empty_value(cls, "archive_identifier")
     _replace_manager(cls, "with_archived")
     _override_methods(cls)
 

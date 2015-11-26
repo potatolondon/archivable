@@ -11,6 +11,12 @@ class ArchiveModel(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
 
+@archivable
+class CharArchiveModel(models.Model):
+    id = models.CharField(max_length=10, primary_key=True)
+    name = models.CharField(max_length=100, unique=True)
+
+
 class ArchiveTests(TestCase):
 
     @mock.patch.object(ArchiveModel, "save")
@@ -82,8 +88,12 @@ class ArchiveTests(TestCase):
         self.assertFalse(('name', 'other_name') in UniqueTogetherModel._meta.unique_together)
         self.assertTrue(('name', 'other_name', 'archive_identifier') in UniqueTogetherModel._meta.unique_together)
 
-    def test_is_archived_property(self):
-        instance = ArchiveModel(name="one", pk=1)
+    @mock.patch.object(CharArchiveModel, "save")
+    def test_is_archived_property(self, mock_save):
+        instance = CharArchiveModel(name="one", pk='hello')
+
         self.assertFalse(instance.is_archived)
-        instance.archive_identifier = 1
+        instance.archive()
         self.assertTrue(instance.is_archived)
+        instance.restore()
+        self.assertFalse(instance.is_archived)
