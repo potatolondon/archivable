@@ -100,7 +100,7 @@ def archivable(cls):
            it's made equal to the instance's PK
          - Manipulates unique constraints to add the archive_identifier
          - Overrides delete to instead archive unless you pass force=True as a param
-         - Adds including_archived as a manager
+         - Adds with_archived as a manager
          - Replaces objects with ExcludeArchivedManager
     """
 
