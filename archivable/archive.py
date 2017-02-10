@@ -58,7 +58,10 @@ def _replace_manager(cls, new_manager_name):
 
     default_manager().contribute_to_class(cls, "with_archived")
     ExcludeArchivedManager().contribute_to_class(cls, "objects")
-    cls._default_manager = cls.objects
+    try:
+        cls._default_manager = cls.objects
+    except AttributeError:  # Django >= 1.10
+        cls._meta.default_manager_name = cls.objects.name
 
 
 post_archive = Signal(providing_args=["instance"])
