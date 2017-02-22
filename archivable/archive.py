@@ -68,6 +68,8 @@ post_archive = Signal(providing_args=["instance"])
 
 
 def _override_methods(cls):
+    overriden_delete = cls.delete
+
     def archive(self):
         self.archive_identifier = self.pk
         self.save()
@@ -79,7 +81,7 @@ def _override_methods(cls):
 
     def delete(self, force=False, *args, **kwargs):
         if force:
-            return super(cls, self).delete(*args, **kwargs)
+            return overriden_delete(self, *args, **kwargs)
         else:
             self.archive()
 
