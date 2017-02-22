@@ -9,16 +9,16 @@ from .archive import _add_field_to_class, _replace_manager
 @archivable
 class ArchiveModel(models.Model):
     """The `archivable` decorator overrides methods, but we sometimes still want
-    to check that the overriden method is called. To do this we call another
-    method that isn't overriden, and can therefore be mocked.
+    to check that the overridden method is called. To do this we call another
+    method that isn't overridden, and can therefore be mocked.
     """
 
     name = models.CharField(max_length=100, unique=True)
 
     def delete(self, *args, **kwargs):
-        self.overriden_delete(*args, **kwargs)
+        self.overridden_delete(*args, **kwargs)
 
-    def overriden_delete(self, *args, **kwargs):
+    def overridden_delete(self, *args, **kwargs):
         super(ArchiveModel, self).delete(*args, **kwargs)
 
 
@@ -32,19 +32,19 @@ class ArchiveTests(TestCase):
         self.assertEqual(instance.pk, instance.archive_identifier)
 
     @mock.patch.object(ArchiveModel, "save")
-    @mock.patch.object(ArchiveModel, "overriden_delete")
-    def test_delete_archives(self, mock_overriden_delete, mock_save):
+    @mock.patch.object(ArchiveModel, "overridden_delete")
+    def test_delete_archives(self, mock_overridden_delete, mock_save):
         instance = ArchiveModel(name="one", id=1, pk=1)
         instance.delete()
         self.assertEqual(instance.pk, instance.archive_identifier)
-        self.assertEqual(mock_overriden_delete.call_count, 0)
+        self.assertEqual(mock_overridden_delete.call_count, 0)
 
-    @mock.patch.object(ArchiveModel, "overriden_delete")
-    def test_delete_deletes_with_force(self, mock_overriden_delete):
+    @mock.patch.object(ArchiveModel, "overridden_delete")
+    def test_delete_deletes_with_force(self, mock_overridden_delete):
         instance = ArchiveModel(name="one", id=1, pk=1)
         instance.delete(force=True)
         self.assertNotEqual(instance.pk, instance.archive_identifier)
-        self.assertEqual(mock_overriden_delete.call_count, 1)
+        self.assertEqual(mock_overridden_delete.call_count, 1)
 
     @mock.patch.object(ArchiveModel, "save")
     def test_restore_restores(self, mock_save):
