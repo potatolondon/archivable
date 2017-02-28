@@ -57,7 +57,14 @@ def _replace_manager(cls, new_manager_name):
             return super(ExcludeArchivedManager, self).get_queryset().filter(archive_identifier=0)
 
     default_manager().contribute_to_class(cls, "with_archived")
-    ExcludeArchivedManager().contribute_to_class(cls, "objects")
+
+    if hasattr(cls._meta, "managers_map"):
+        manager = ExcludeArchivedManager()
+        manager.model = cls
+        cls._meta.managers_map["objects"] = manager
+    else:
+        ExcludeArchivedManager().contribute_to_class(cls, "objects")
+
     try:
         cls._default_manager = cls.objects
     except AttributeError:  # Django >= 1.10
