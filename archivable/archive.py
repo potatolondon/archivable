@@ -58,12 +58,9 @@ def _replace_manager(cls, new_manager_name):
 
     default_manager().contribute_to_class(cls, "with_archived")
 
-    if hasattr(cls._meta, "managers_map"):
-        manager = ExcludeArchivedManager()
-        manager.model = cls
-        cls._meta.managers_map["objects"] = manager
-    else:
-        ExcludeArchivedManager().contribute_to_class(cls, "objects")
+    manager = ExcludeArchivedManager()
+    manager.model = cls
+    cls.objects = manager
 
     try:
         cls._default_manager = cls.objects
