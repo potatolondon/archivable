@@ -68,29 +68,38 @@ post_archive = Signal(providing_args=["instance"])
 
 
 def _override_methods(cls):
-    def archive(self):
-        self.archive_identifier = self.pk
-        self.save()
-        post_archive.send(sender=self.__class__, instance=self)
 
-    def restore(self):
-        self.archive_identifier = 0
-        self.save()
+    class Mixin(object):
+        def archive(self):
+            self.archive_identifier = self.pk
+            self.save(update_fields=["archive_identifier"])
 
-    def delete(self, force=False, *args, **kwargs):
-        if force:
-            return super(cls, self).delete(*args, **kwargs)
-        else:
-            self.archive()
+            parent = super(Mixin, self)
+            if hasattr(parent, "archive"):
+                parent.archive()
 
-    @property
-    def is_archived(self):
-        return self.archive_identifier != 0
+            post_archive.send(sender=self.__class__, instance=self)
 
-    cls.archive = archive
-    cls.restore = restore
-    cls.delete = delete
-    cls.is_archived = is_archived
+        def restore(self):
+            self.archive_identifier = 0
+            self.save(update_fields=["archive_identifier"])
+
+            parent = super(Mixin, self)
+            if hasattr(parent, "restore"):
+                parent.archive()
+
+        def delete(self, force=False, *args, **kwargs):
+            if force:
+                return super(Mixin, self).delete(*args, **kwargs)
+            else:
+                self.archive()
+
+        @property
+        def is_archived(self):
+            return self.archive_identifier != 0
+
+    # Insert our mixin above the class we are decorating in the __bases__
+    cls.__bases__ = tuple([Mixin] + list(cls.__bases__))
 
 
 def archivable(cls):
