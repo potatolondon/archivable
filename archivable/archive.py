@@ -1,5 +1,6 @@
 from django.db import models
 from django.dispatch import Signal
+from django.forms import ModelForm
 
 
 def _add_field_to_class(cls, name):
@@ -126,3 +127,13 @@ def archivable(cls):
     _override_methods(cls)
 
     return cls
+
+
+class ArchivableModelForm(ModelForm):
+    def _get_validation_exclusions(self):
+        """ `archive_identifier` is uneditable, so isn't validated, but is
+        used in `unique_together` constraints. We remove it from the validation
+        exclusion list to make sure it is validated when checking uniqueness.
+        """
+        excluded = super(BaseModelForm, self)._get_validation_exclusions()
+        excluded.remove("archive_identifier")
