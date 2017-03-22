@@ -91,7 +91,7 @@ def _override_methods(cls):
 
             parent = super(Mixin, self)
             if hasattr(parent, "restore"):
-                parent.archive()
+                parent.restore()
 
         def delete(self, force=False, *args, **kwargs):
             if force:
