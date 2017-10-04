@@ -6,20 +6,25 @@ from . import archivable
 from .archive import _add_field_to_class, _replace_manager
 
 
-@archivable
-class ArchiveModel(models.Model):
-    """The `archivable` decorator overrides methods, but we sometimes still want
-    to check that the overridden method is called. To do this we call another
-    method that isn't overridden, and can therefore be mocked.
+class BaseModel(models.Model):
+    """ Since the `archivable` adds a mixin instead of overriding
+    the methods, we need to make sure the mixin methods are used
+    and not overridden by ArchiveModel, hence the base class. 
     """
-
-    name = models.CharField(max_length=100, unique=True)
-
     def delete(self, *args, **kwargs):
         self.overridden_delete(*args, **kwargs)
 
     def overridden_delete(self, *args, **kwargs):
-        super(ArchiveModel, self).delete(*args, **kwargs)
+        super(BaseModel, self).delete(*args, **kwargs)
+
+
+@archivable
+class ArchiveModel(BaseModel):
+    """The `archivable` decorator overrides methods, but we sometimes still want
+    to check that the overridden method is called. To do this we call another
+    method that isn't overridden, and can therefore be mocked.
+    """
+    name = models.CharField(max_length=100, unique=True)
 
 
 class ArchiveTests(TestCase):
