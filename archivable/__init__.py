@@ -1,4 +1,4 @@
 __all__ = ['archivable']
 
 
-from archive import archivable
+from .archive import archivable

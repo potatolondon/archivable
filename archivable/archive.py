@@ -5,7 +5,7 @@ from django.forms import ModelForm
 
 def _add_field_to_class(cls, name):
     try:
-        pk_field = (x for x in cls._meta.fields if x.primary_key).next()
+        pk_field = next(x for x in cls._meta.fields if x.primary_key)
         pk_type = pk_field.__class__
     except StopIteration:
         pk_type = None
